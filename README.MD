@@ -18,6 +18,7 @@ To download and prepare the dataset, run:
 ```sh
 make download_dataset
 ```
+It will download the dataset and place it in the data folder located in the root directory of the project.
 
 ## Training the Model
 To start training the model, use the following command:
@@ -29,26 +30,11 @@ This will run the training process using the configuration specified in `config/
 
 ## Experiment Tracking
 
-We use ClearML for tracking experiments. You can find the metrics and configurations of the experiments in ClearML. Check out the experiment details [here](https://app.clear.ml/projects/f4150405bcd64ba99f413b9bf141dc40/experiments/ad104d9bbddd490f9da745f8025eb358/output/execution). 
+We use ClearML for tracking experiments. You can find the metrics and configurations of the experiments in ClearML. Check out the experiment details [here](https://app.clear.ml/projects/f4150405bcd64ba99f413b9bf141dc40/experiments/ad104d9bbddd490f9da745f8025eb358/output/execution). Make sure you have your ClearML credentials set up.
 
-Make sure you have your ClearML credentials set up.
-
-## Logs and Checkpoints
-
-### TensorBoard Logs
-
-During training, TensorBoard logs are saved in the `lightning_logs` folder. This folder contains:
-
-- **TensorBoard Event Files**: These logs can be visualized using TensorBoard to monitor training metrics over time.
-
-To view the logs in TensorBoard, navigate to the root directory of the project and run:
-
-```sh
-tensorboard --logdir=lightning_logs
-```
 
 ## Model Checkpoints
-Model checkpoints are saved periodically during training in the `experiments` directory. These checkpoints can be used to resume training or for inference. The checkpoint files are named based on the epoch and validation F1 score.
+Model checkpoints will be saved periodically during training in the `experiments` directory. These checkpoints can be used to resume training or for inference. The checkpoint files are named based on the epoch and validation F1 score.
 
 ## Resuming Training
 If the training process is interrupted, you can resume training from the last checkpoint. 
@@ -101,18 +87,11 @@ This will apply the linting rules defined in `setup.cfg` to the entire project.
 ```
 ├── config
 │   └── config.yaml
-├── data
-│   ├── planet
-│   └── test-jpg-additional
-├── experiments
-│   └── experiment1
-│       ├── epoch=00-val_f1=0.476.ckpt
-│       └── ...
+├── inference_images
+│   ├── file_99.jpg
+│   ├── file_212.jpg
 │   └── ...
-├── lightning_logs
-│   ├── version_0
-│   ├── version_1
-│   └── ...
+├── model_weights
 ├── src
 │   ├── augmentations.py
 │   ├── config.py
@@ -127,8 +106,9 @@ This will apply the linting rules defined in `setup.cfg` to the entire project.
 │   ├── train.py
 │   └── train_utils.py
 ├── Makefile
-├── requirements.txt
-└── README.md
+├── predictions.csv
+├── README.md
+└── requirements.txt
 ```
 
 
