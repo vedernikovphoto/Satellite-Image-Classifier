@@ -119,13 +119,10 @@ class PlanetModule(pl.LightningModule):
         pr_labels = torch.sigmoid(pr_logits)
         self._test_metrics(pr_labels, gt_labels)
 
-    def on_validation_epoch_start(self) -> None:
-        """Resets validation metrics at the start of each validation epoch."""
-        self._valid_metrics.reset()
-
     def on_validation_epoch_end(self) -> None:
-        """Logs validation metrics at the end of each validation epoch."""
+        """Logs validation metrics at the end of each validation epoch and resets metrics."""
         self.log_dict(self._valid_metrics.compute(), on_epoch=True)
+        self._valid_metrics.reset()
 
     def on_test_epoch_end(self) -> None:
         """Logs test metrics at the end of each test epoch."""
