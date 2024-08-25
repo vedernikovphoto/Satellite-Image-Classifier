@@ -24,7 +24,7 @@ def get_transforms(
     width: int,
     height: int,
     flags: TransformFlags = None,
-) -> albu.BaseCompose:
+) -> albu.Compose:
     """
     Get the data augmentation and preprocessing transformations.
 
