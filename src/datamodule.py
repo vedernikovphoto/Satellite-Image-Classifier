@@ -5,7 +5,7 @@ import pandas as pd
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset
 
-from src.augmentations import get_transforms
+from src.augmentations import get_transforms, TransformFlags
 from src.config import Config
 from src.dataset import PlanetDataset, DatasetConfig
 from src.dataset_splitter import stratify_shuffle_split_subsets
@@ -32,7 +32,7 @@ class PlanetDM(LightningDataModule):
         """
         Prepare data by splitting and saving datasets.
         """
-        split_and_save_datasets(self._config.data_config.data_path, self._config.seed, self._config.data_config.train_size)
+        split_and_save_datasets(self._config.data_config.data_path, self._config.seed, self._config.data_config.train_size)  # noqa: E501
 
     def setup(self, stage: Optional[str] = None):
         """
@@ -66,6 +66,7 @@ class PlanetDM(LightningDataModule):
                     aug_config=self._augmentation_params,
                     width=self._config.data_config.width,
                     height=self._config.data_config.height,
+                    flags=TransformFlags(preprocessing=True, augmentations=False, postprocessing=True),
                 ),
                 label_encoder=self.label_encoder,
             )

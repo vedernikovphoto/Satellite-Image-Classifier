@@ -8,7 +8,7 @@ from skmultilearn.model_selection.iterative_stratification import IterativeStrat
 
 def stratify_shuffle_split_subsets(
     annotation: pd.DataFrame,
-    seed: int, 
+    seed: int,
     train_fraction: float = 0.8,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
@@ -24,7 +24,7 @@ def stratify_shuffle_split_subsets(
     """
     all_x, all_y, mlb = _prepare_data(annotation)
 
-    train_indexes, else_indexes = _split(all_x, all_y, seed, distribution=[1 - train_fraction, train_fraction])
+    train_indexes, else_indexes = _split(all_x, all_y, seed, distribution=[1 - train_fraction, train_fraction])  # noqa: WPS221, E501
     x_train, y_train, x_else, y_else = _get_split_data(all_x, all_y, train_indexes, else_indexes)
 
     test_indexes, valid_indexes = _split(x_else, y_else, seed, distribution=[0.5, 0.5])
