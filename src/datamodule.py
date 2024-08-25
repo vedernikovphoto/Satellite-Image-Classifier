@@ -32,7 +32,7 @@ class PlanetDM(LightningDataModule):
         """
         Prepare data by splitting and saving datasets.
         """
-        split_and_save_datasets(self._config.data_config.data_path, self._config.data_config.train_size)
+        split_and_save_datasets(self._config.data_config.data_path, self._config.seed, self._config.data_config.train_size)
 
     def setup(self, stage: Optional[str] = None):
         """
@@ -120,18 +120,19 @@ class PlanetDM(LightningDataModule):
         )
 
 
-def split_and_save_datasets(data_path: str, train_fraction: float = 0.8):
+def split_and_save_datasets(data_path: str, seed: int, train_fraction: float = 0.8):
     """
     Split and save the datasets into train, validation, and test sets.
 
     Args:
         data_path (str): Path to the data directory.
+        seed (int): Seed for reproducibility.
         train_fraction (float): Fraction of data to use for training.
     """
     df = pd.read_csv(os.path.join(data_path, 'train_classes.csv'))
     df = df.drop_duplicates()
 
-    train_df, valid_df, test_df = stratify_shuffle_split_subsets(df, train_fraction=train_fraction)
+    train_df, valid_df, test_df = stratify_shuffle_split_subsets(df, seed, train_fraction=train_fraction)
 
     train_df.to_csv(os.path.join(data_path, 'df_train.csv'), index=False)
     valid_df.to_csv(os.path.join(data_path, 'df_valid.csv'), index=False)

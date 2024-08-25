@@ -8,6 +8,7 @@ from skmultilearn.model_selection.iterative_stratification import IterativeStrat
 
 def stratify_shuffle_split_subsets(
     annotation: pd.DataFrame,
+    seed: int, 
     train_fraction: float = 0.8,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
@@ -15,6 +16,7 @@ def stratify_shuffle_split_subsets(
 
     Args:
         annotation (pd.DataFrame): DataFrame containing image annotations with image names and tags.
+        seed (int): Seed for reproducibility.
         train_fraction (float): Portion of data for training; the rest is equally split into validation and test sets.
 
     Returns:
@@ -22,10 +24,10 @@ def stratify_shuffle_split_subsets(
     """
     all_x, all_y, mlb = _prepare_data(annotation)
 
-    train_indexes, else_indexes = _split(all_x, all_y, distribution=[1 - train_fraction, train_fraction])
+    train_indexes, else_indexes = _split(all_x, all_y, seed, distribution=[1 - train_fraction, train_fraction])
     x_train, y_train, x_else, y_else = _get_split_data(all_x, all_y, train_indexes, else_indexes)
 
-    test_indexes, valid_indexes = _split(x_else, y_else, distribution=[0.5, 0.5])
+    test_indexes, valid_indexes = _split(x_else, y_else, seed, distribution=[0.5, 0.5])
     x_test, y_test, x_valid, y_valid = _get_split_data(x_else, y_else, test_indexes, valid_indexes)
 
     train_subset = _create_subset(x_train, y_train, mlb)
@@ -110,6 +112,7 @@ def _create_subset(x_data: np.array, y_data: np.array, mlb: MultiLabelBinarizer)
 def _split(
     xs: np.array,
     ys: np.array,
+    seed: int,
     distribution: List[float],
 ) -> Tuple[np.array, np.array]:
     """
@@ -118,11 +121,13 @@ def _split(
     Args:
         xs (np.ndarray): Array of features.
         ys (np.ndarray): Array of labels.
+        seed (int): Seed for reproducibility.
         distribution (List[float]): Distribution for the split.
 
     Returns:
         Tuple[np.ndarray, np.ndarray]: Indexes for the two splits.
     """
+    np.random.seed(seed)
     stratifier = IterativeStratification(n_splits=2, sample_distribution_per_fold=distribution)
 
     return next(stratifier.split(X=xs, y=ys))
