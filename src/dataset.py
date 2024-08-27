@@ -62,11 +62,6 @@ class PlanetDataset(Dataset):
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # data_dict = {'image': image, 'labels': labels}
-        # if self.transforms is not None:
-        #     data_dict = self.transforms(**data_dict)
-        # return data_dict['image'], data_dict['labels']
-    
         if self.transforms is not None:
             image = self.transforms(image=image)["image"]
     

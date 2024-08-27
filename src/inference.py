@@ -64,6 +64,7 @@ def prepare_image(image_path: str, config: Config):
     return torch.tensor(image).unsqueeze(0)
 
 
+@torch.inference_mode()
 def run_inference(model: PlanetModule, image: torch.Tensor, config: Config, image_path: str):
     """
     Run inference on a single image and returns the predictions.
@@ -81,19 +82,18 @@ def run_inference(model: PlanetModule, image: torch.Tensor, config: Config, imag
     model.to(device)
     image = image.to(device)
 
-    with torch.no_grad():
-        logits = model(image)
-        probs = torch.sigmoid(logits).cpu().numpy().flatten()
-        label_names = list(config.label_encoder.keys())
-        threshold = 0.5
+    logits = model(image)
+    probs = torch.sigmoid(logits).cpu().numpy().flatten()
+    label_names = list(config.label_encoder.keys())
+    threshold = 0.5
 
-        # Get the labels above the threshold
-        tags = [label for label, prob in zip(label_names, probs) if prob > threshold]
+    # Get the labels above the threshold
+    tags = [label for label, prob in zip(label_names, probs) if prob > threshold]
 
-        # Extract the image name
-        image_name = os.path.basename(image_path)
+    # Extract the image name
+    image_name = os.path.basename(image_path)
 
-        return {'image_name': image_name, 'tags': ' '.join(tags)}
+    return {'image_name': image_name, 'tags': ' '.join(tags)}
 
 
 def main():
