@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 import pandas as pd
+import numpy as np
 import cv2
 from dataclasses import dataclass
 from torch.utils.data import Dataset
@@ -32,16 +33,17 @@ class PlanetDataset(Dataset):
         df (pd.DataFrame): DataFrame containing image names and labels.
         config (DatasetConfig): Configuration object containing dataset parameters.
     """
-    def __init__(
-        self,
-        df: pd.DataFrame,
-        config: DatasetConfig,
-    ):
-        self.df = df
+    def __init__(self, df: pd.DataFrame, config: DatasetConfig):
         self.image_folder = config.image_folder
         self.transforms = config.transforms
         self.label_encoder = config.label_encoder
         self.num_classes = config.num_classes
+
+        # Convert DataFrame columns to NumPy arrays
+        image_names = df['image_name'].to_numpy()
+        image_paths = [os.path.join(self.image_folder, f'{name}.jpg') for name in image_names]  # noqa: WPS221
+        self.image_paths = np.array(image_paths)
+        self.labels = df.drop('image_name', axis=1).to_numpy().astype('float32')
 
     def __getitem__(self, idx: int):
         """
@@ -53,18 +55,15 @@ class PlanetDataset(Dataset):
         Returns:
             tuple: (image, labels) where image is the transformed image and labels are the corresponding labels.
         """
-        row = self.df.iloc[idx]
-
-        image_path = os.path.join(self.image_folder, f'{row.image_name}.jpg')
-
-        labels = row.drop('image_name').values.astype('float32')
+        image_path = self.image_paths[idx]
+        labels = self.labels[idx]
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         if self.transforms is not None:
-            image = self.transforms(image=image)["image"]
-    
+            image = self.transforms(image=image)['image']
+
         return image, labels
 
     def __len__(self) -> int:
@@ -74,4 +73,4 @@ class PlanetDataset(Dataset):
         Returns:
             int: Number of items in the dataset.
         """
-        return len(self.df)
+        return len(self.image_paths)
