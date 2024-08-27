@@ -2,6 +2,7 @@ import albumentations as albu
 from albumentations.pytorch import ToTensorV2
 from src.config import AugmentationConfig
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -23,7 +24,7 @@ def get_transforms(
     aug_config: AugmentationConfig,
     width: int,
     height: int,
-    flags: TransformFlags = None,
+    flags: Optional[TransformFlags] = None,
 ) -> albu.Compose:
     """
     Get the data augmentation and preprocessing transformations.
