@@ -6,37 +6,6 @@ import pandas as pd
 from skmultilearn.model_selection.iterative_stratification import IterativeStratification
 
 
-def stratify_shuffle_split_subsets(
-    annotation: pd.DataFrame,
-    seed: int,
-    train_fraction: float = 0.8,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """
-    Stratify, shuffle, and split the dataset into train, validation, and test subsets.
-
-    Args:
-        annotation (pd.DataFrame): DataFrame containing image annotations with image names and tags.
-        seed (int): Seed for reproducibility.
-        train_fraction (float): Portion of data for training; the rest is equally split into validation and test sets.
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: Train, validation, and test subsets as DataFrames.
-    """
-    all_x, all_y, mlb = _prepare_data(annotation)
-
-    train_indexes, else_indexes = _split(all_x, all_y, seed, distribution=[1 - train_fraction, train_fraction])  # noqa: WPS221, E501
-    x_train, y_train, x_else, y_else = _get_split_data(all_x, all_y, train_indexes, else_indexes)
-
-    test_indexes, valid_indexes = _split(x_else, y_else, seed, distribution=[0.5, 0.5])
-    x_test, y_test, x_valid, y_valid = _get_split_data(x_else, y_else, test_indexes, valid_indexes)
-
-    train_subset = _create_subset(x_train, y_train, mlb)
-    valid_subset = _create_subset(x_valid, y_valid, mlb)
-    test_subset = _create_subset(x_test, y_test, mlb)
-
-    return train_subset, valid_subset, test_subset
-
-
 def _prepare_data(annotation: pd.DataFrame) -> Tuple[np.array, np.array, MultiLabelBinarizer]:
     """
     Prepare data by extracting features and labels and binarizing the labels.
@@ -131,3 +100,34 @@ def _split(
     stratifier = IterativeStratification(n_splits=2, sample_distribution_per_fold=distribution)
 
     return next(stratifier.split(X=xs, y=ys))
+
+
+def stratify_shuffle_split_subsets(
+    annotation: pd.DataFrame,
+    seed: int,
+    train_fraction: float = 0.8,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Stratify, shuffle, and split the dataset into train, validation, and test subsets.
+
+    Args:
+        annotation (pd.DataFrame): DataFrame containing image annotations with image names and tags.
+        seed (int): Seed for reproducibility.
+        train_fraction (float): Portion of data for training; the rest is equally split into validation and test sets.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]: Train, validation, and test subsets as DataFrames.
+    """
+    all_x, all_y, mlb = _prepare_data(annotation)
+
+    train_indexes, else_indexes = _split(all_x, all_y, seed, distribution=[1 - train_fraction, train_fraction])  # noqa: WPS221, E501
+    x_train, y_train, x_else, y_else = _get_split_data(all_x, all_y, train_indexes, else_indexes)
+
+    test_indexes, valid_indexes = _split(x_else, y_else, seed, distribution=[0.5, 0.5])
+    x_test, y_test, x_valid, y_valid = _get_split_data(x_else, y_else, test_indexes, valid_indexes)
+
+    train_subset = _create_subset(x_train, y_train, mlb)
+    valid_subset = _create_subset(x_valid, y_valid, mlb)
+    test_subset = _create_subset(x_test, y_test, mlb)
+
+    return train_subset, valid_subset, test_subset
