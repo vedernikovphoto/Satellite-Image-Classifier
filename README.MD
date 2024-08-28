@@ -5,8 +5,8 @@ This project focuses on classifying satellite images based on different types of
 ## Installation
 1. **Clone the repository:**
    ```sh
-   git clone <your-repo-url>
-   cd <your-repo-name>
+    git clone https://github.com/vedernikovphoto/Satellite-Image-Classifier.git
+    cd Satellite-Image-Classifier
    ```
 
 2. **Install the required packages:**
