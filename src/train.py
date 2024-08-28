@@ -1,6 +1,7 @@
 import argparse
 import os
 import torch
+import logging
 
 import pytorch_lightning as pl
 from clearml import Task
@@ -12,7 +13,10 @@ from src.datamodule import PlanetDM
 from src.lightning_module import PlanetModule
 
 
-def save_torchscript_model(model, save_path, example_input) -> torch.Tensor: 
+logging.basicConfig(level=logging.INFO)
+
+
+def save_torchscript_model(model, save_path, example_input) -> torch.Tensor:
     """
     Converts the PyTorch model to TorchScript and saves it.
 
@@ -38,6 +42,25 @@ def arg_parse() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def prepare_task(config: Config) -> Task:
+    """
+    Initializes and prepares a ClearML task.
+
+    Args:
+        config (Config): Configuration object containing all training parameters.
+
+    Returns:
+        Task: The initialized ClearML task.
+    """
+    task = Task.init(
+        project_name=config.project_name,
+        task_name=f'{config.experiment_name}',
+        auto_connect_frameworks=True,
+    )
+    task.connect(config.dict())
+    return task
+
+
 def train(config: Config) -> None:
     """
     Trains and tests the Planet model.
@@ -47,13 +70,7 @@ def train(config: Config) -> None:
     """
     datamodule = PlanetDM(config)
     model = PlanetModule(config)
-
-    task = Task.init(
-        project_name=config.project_name,
-        task_name=f'{config.experiment_name}',
-        auto_connect_frameworks=True,
-    )
-    task.connect(config.dict())
+    task = prepare_task(config)   # noqa: F841
 
     experiment_save_path = os.path.join(EXPERIMENTS_PATH, config.experiment_name)
     os.makedirs(experiment_save_path, exist_ok=True)
@@ -80,29 +97,30 @@ def train(config: Config) -> None:
     trainer.fit(model=model, datamodule=datamodule)
     trainer.test(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
-    print("Starting testing with the best checkpoint...")
+    # Starting testing with the best checkpoint
     trainer.test(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
-    print("Loading the best model from checkpoint...")
+    # Loading the best model from checkpoint
     best_model = PlanetModule.load_from_checkpoint(checkpoint_callback.best_model_path, config=config)
 
-    print("Extracting the core model from the loaded checkpoint...")
-    core_model = best_model.get_core_model()  # Extract the core model
+    # Extracting the core model from the loaded checkpoint
+    core_model = best_model.get_core_model()
 
-    print(f"Moving core model to device: {config.device}")
-    core_model.to(config.device)  # Ensure the model is on the correct device
+    # Moving core model to device: {config.device}
+    core_model.to(config.device)
 
-    print("Setting core model to evaluation mode...")
-    core_model.eval()  # Set to evaluation mode
+    # Setting core model to evaluation mode
+    core_model.eval()
 
-    print("Generating example input for model tracing...")
+    # Generating example input for model tracing
     example_input = torch.randn(1, *config.data_config.input_size).to(config.device)
 
+    # Saving the TorchScript model
     torchscript_model_path = os.path.join(experiment_save_path, 'model.pt')
-    print(f"Saving the TorchScript model to: {torchscript_model_path}")
-    save_torchscript_model(core_model, torchscript_model_path, example_input)  # Trace the core model
+    save_torchscript_model(core_model, torchscript_model_path, example_input)
 
-    print(f"TorchScript model saved successfully at {torchscript_model_path}")
+    logging.info(f'TorchScript model saved successfully at {torchscript_model_path}')
+
 
 if __name__ == '__main__':
     args = arg_parse()

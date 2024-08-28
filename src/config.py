@@ -31,6 +31,7 @@ class DataConfig(BaseModel):
         train_size (float): Proportion of the data to be used for training.
         width (int): Width to resize the images to.
         height (int): Height to resize the images to.
+        input_size (tuple): Tuple representing the input size of the model (channels, height, width).
     """
     data_path: str
     batch_size: int
@@ -38,6 +39,7 @@ class DataConfig(BaseModel):
     train_size: float
     width: int
     height: int
+    input_size: tuple
 
 
 class AugmentationConfig(BaseModel):

@@ -40,7 +40,7 @@ def _split_tags(y_data: pd.DataFrame) -> List[List[str]]:
     return y_data['tags'].apply(lambda tags: tags.split()).tolist()
 
 
-def _get_split_data(all_x, all_y, first_indexes, second_indexes) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def _get_split_data(all_x, all_y, first_indexes, second_indexes) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:    # noqa: WPS221, E501
     """
     Split data into two sets based on provided indexes.
 

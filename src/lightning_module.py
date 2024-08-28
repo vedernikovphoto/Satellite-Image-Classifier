@@ -1,6 +1,6 @@
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
+import torch.nn as nn   # noqa: WPS301
 from timm import create_model
 
 from src.config import Config
@@ -62,7 +62,7 @@ class PlanetModule(pl.LightningModule):
         Returns the core PyTorch model for tracing.
         """
         return self._model
-    
+
     def configure_optimizers(self) -> dict:
         """
         Configures the optimizers and learning rate scheduler.

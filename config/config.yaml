@@ -36,6 +36,7 @@ data_config:
   train_size: 0.8
   width: 224
   height: 224
+  input_size: [3, 224, 224]
 
 augmentation_params:
   hue_shift_limit: 20
