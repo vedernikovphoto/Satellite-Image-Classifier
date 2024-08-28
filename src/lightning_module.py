@@ -56,7 +56,7 @@ class PlanetModule(pl.LightningModule):
         """
         return self._model(x)
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> dict:
         """
         Configures the optimizers and learning rate scheduler.
 
@@ -78,7 +78,7 @@ class PlanetModule(pl.LightningModule):
             },
         }
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, batch_idx) -> torch.Tensor:
         """
         Training step.
 
@@ -93,7 +93,7 @@ class PlanetModule(pl.LightningModule):
         pr_logits = self(images)
         return self._calculate_loss(pr_logits, gt_labels, 'train_')
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx) -> None:
         """
         Validation step.
 
@@ -106,7 +106,7 @@ class PlanetModule(pl.LightningModule):
         pr_labels = torch.sigmoid(pr_logits)
         self._valid_metrics(pr_labels, gt_labels)
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch, batch_idx) -> None:
         """
         Test step.
 

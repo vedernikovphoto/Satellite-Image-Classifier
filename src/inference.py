@@ -40,7 +40,7 @@ def load_model(config: Config, model_path: str) -> PlanetModule:
     return model
 
 
-def prepare_image(image_path: str, config: Config):
+def prepare_image(image_path: str, config: Config) -> torch.Tensor:
     """
     Prepare the image for inference.
 
@@ -65,7 +65,7 @@ def prepare_image(image_path: str, config: Config):
 
 
 @torch.inference_mode()
-def run_inference(model: PlanetModule, image: torch.Tensor, config: Config, image_path: str):
+def run_inference(model: PlanetModule, image: torch.Tensor, config: Config, image_path: str) -> dict:
     """
     Run inference on a single image and returns the predictions.
 

@@ -11,7 +11,7 @@ from src.datamodule import PlanetDM
 from src.lightning_module import PlanetModule
 
 
-def arg_parse():
+def arg_parse() -> argparse.Namespace:
     """
     Parses command-line arguments.
 
@@ -23,7 +23,7 @@ def arg_parse():
     return parser.parse_args()
 
 
-def train(config: Config):
+def train(config: Config) -> None:
     """
     Trains and tests the Planet model.
 

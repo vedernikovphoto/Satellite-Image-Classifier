@@ -27,7 +27,7 @@ def _prepare_data(annotation: pd.DataFrame) -> Tuple[np.array, np.array, MultiLa
     return all_x, all_y, mlb
 
 
-def _split_tags(y_data: pd.DataFrame) -> list:
+def _split_tags(y_data: pd.DataFrame) -> List[List[str]]:
     """
     Split tags string into a list of tags for each image.
 
@@ -40,7 +40,7 @@ def _split_tags(y_data: pd.DataFrame) -> list:
     return y_data['tags'].apply(lambda tags: tags.split()).tolist()
 
 
-def _get_split_data(all_x, all_y, first_indexes, second_indexes):
+def _get_split_data(all_x, all_y, first_indexes, second_indexes) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Split data into two sets based on provided indexes.
 

@@ -36,7 +36,7 @@ def get_transforms(
         flags (TransformFlags): Transform flags for preprocessing, augmentations, and postprocessing.
 
     Returns:
-        albu.BaseCompose: Composed transformations.
+        albu.Compose: Composed transformations.
     """
     if flags is None:
         flags = TransformFlags()

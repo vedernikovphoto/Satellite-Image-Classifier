@@ -28,13 +28,13 @@ class PlanetDM(LightningDataModule):
         self.valid_dataset: Optional[Dataset] = None
         self.test_dataset: Optional[Dataset] = None
 
-    def prepare_data(self):
+    def prepare_data(self) -> None:
         """
         Prepare data by splitting and saving datasets.
         """
         split_and_save_datasets(self._config.data_config.data_path, self._config.seed, self._config.data_config.train_size)  # noqa: E501
 
-    def setup(self, stage: Optional[str] = None):
+    def setup(self, stage: Optional[str] = None) -> None:
         """
         Set up datasets for training, validation, and testing.
 
@@ -121,7 +121,7 @@ class PlanetDM(LightningDataModule):
         )
 
 
-def split_and_save_datasets(data_path: str, seed: int, train_fraction: float = 0.8):
+def split_and_save_datasets(data_path: str, seed: int, train_fraction: float = 0.8) -> None:
     """
     Split and save the datasets into train, validation, and test sets.
 

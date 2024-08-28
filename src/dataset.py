@@ -33,7 +33,7 @@ class PlanetDataset(Dataset):
         df (pd.DataFrame): DataFrame containing image names and labels.
         config (DatasetConfig): Configuration object containing dataset parameters.
     """
-    def __init__(self, df: pd.DataFrame, config: DatasetConfig):
+    def __init__(self, df: pd.DataFrame, config: DatasetConfig) -> None:
         self.image_folder = config.image_folder
         self.transforms = config.transforms
         self.label_encoder = config.label_encoder
@@ -45,7 +45,7 @@ class PlanetDataset(Dataset):
         self.image_paths = np.array(image_paths)
         self.labels = df.drop('image_name', axis=1).to_numpy().astype('float32')
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> tuple[np.ndarray, np.ndarray]:
         """
         Get an item by index.
 
