@@ -1,5 +1,6 @@
 import argparse
 import os
+import torch
 
 import pytorch_lightning as pl
 from clearml import Task
@@ -9,6 +10,20 @@ from src.config import Config
 from src.constants import EXPERIMENTS_PATH
 from src.datamodule import PlanetDM
 from src.lightning_module import PlanetModule
+
+
+def save_torchscript_model(model, save_path, example_input) -> torch.Tensor: 
+    """
+    Converts the PyTorch model to TorchScript and saves it.
+
+    Args:
+        model (nn.Module): The model to be saved.
+        save_path (str): The path where to save the TorchScript model.
+        example_input (torch.Tensor): Example input for tracing the model.
+    """
+    model.eval()
+    traced_model = torch.jit.trace(model, example_input)
+    torch.jit.save(traced_model, save_path)
 
 
 def arg_parse() -> argparse.Namespace:
@@ -65,6 +80,29 @@ def train(config: Config) -> None:
     trainer.fit(model=model, datamodule=datamodule)
     trainer.test(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
 
+    print("Starting testing with the best checkpoint...")
+    trainer.test(ckpt_path=checkpoint_callback.best_model_path, datamodule=datamodule)
+
+    print("Loading the best model from checkpoint...")
+    best_model = PlanetModule.load_from_checkpoint(checkpoint_callback.best_model_path, config=config)
+
+    print("Extracting the core model from the loaded checkpoint...")
+    core_model = best_model.get_core_model()  # Extract the core model
+
+    print(f"Moving core model to device: {config.device}")
+    core_model.to(config.device)  # Ensure the model is on the correct device
+
+    print("Setting core model to evaluation mode...")
+    core_model.eval()  # Set to evaluation mode
+
+    print("Generating example input for model tracing...")
+    example_input = torch.randn(1, *config.data_config.input_size).to(config.device)
+
+    torchscript_model_path = os.path.join(experiment_save_path, 'model.pt')
+    print(f"Saving the TorchScript model to: {torchscript_model_path}")
+    save_torchscript_model(core_model, torchscript_model_path, example_input)  # Trace the core model
+
+    print(f"TorchScript model saved successfully at {torchscript_model_path}")
 
 if __name__ == '__main__':
     args = arg_parse()

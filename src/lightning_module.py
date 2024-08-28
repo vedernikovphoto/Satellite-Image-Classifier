@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+import torch.nn as nn
 from timm import create_model
 
 from src.config import Config
@@ -56,6 +57,12 @@ class PlanetModule(pl.LightningModule):
         """
         return self._model(x)
 
+    def get_core_model(self) -> nn.Module:
+        """
+        Returns the core PyTorch model for tracing.
+        """
+        return self._model
+    
     def configure_optimizers(self) -> dict:
         """
         Configures the optimizers and learning rate scheduler.
